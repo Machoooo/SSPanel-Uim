@@ -121,7 +121,13 @@ class VueController extends BaseController
         $subUrl = Config::get('subUrl');
         $baseUrl = Config::get('baseUrl');
         $user['online_ip_count'] = $user->online_ip_count();
-
+        $user['is_vip'] = 0;
+        if($user['vip_date'] > time()){
+            $user['is_vip'] = 1;
+            $left = intval(($user['vip_date'] - time())/86400);
+            $left = date('H:i:s', $left);
+            $user['vip_message'] = "您的会员还{$left}天到期";
+        }
         $res['info'] = array(
             'user' => $user,
             'ssrSubToken' => $ssr_sub_token,
@@ -330,6 +336,23 @@ class VueController extends BaseController
 
         return $response->getBody()->write(json_encode($res));
     }
+
+    public function software($request, $response, $args){
+        return $this->view()->display('software.tpl');
+    }
+    public function getIns($request, $response, $args){
+        //https://www.instagram.com/p/B3eKnuMnN2t/?utm_source=ig_web_copy_link
+        $url = $_GET['url'];
+        $p = "(B[a-zA-Z0-9]*)";
+        preg_match($p,$url,$m);
+        $shortcode = json_encode(array('shortcode' => $m[0]));
+        $ins = "https://www.instagram.com/graphql/query/?query_hash=477b65a610463740ccdb83135b2014db&variables=$shortcode";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $ins);
+        $output = curl_exec($ch);
+        curl_close($ch);
+        $output = json_decode($output,true);
+      }
 
     public function getNodeList($request, $response, $args)
     {

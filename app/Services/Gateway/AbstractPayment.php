@@ -39,6 +39,7 @@ abstract class AbstractPayment
         $p->save();
         $user = User::find($p->userid);
         $user->money += $p->total;
+        $user->vip_date += time() + ($p->total) * 86400 * 5;
         $user->save();
         $codeq = new Code();
         $codeq->code = $method;

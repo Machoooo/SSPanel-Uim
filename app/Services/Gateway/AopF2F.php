@@ -71,20 +71,26 @@ class AopF2F extends AbstractPayment
 
     public function notify($request, $response, $args)
     {
-        $gateway = $this->createGateway();
-        $aliRequest = $gateway->completePurchase();
-        $aliRequest->setParams($_POST);
+//        $gateway = $this->createGateway();
+//        $aliRequest = $gateway->completePurchase();
+//        $aliRequest->setParams($_POST);
 
-        try {
-            /** @var \Omnipay\Alipay\Responses\AopCompletePurchaseResponse $response */
-            $aliResponse = $aliRequest->send();
-            $pid = $aliResponse->data('out_trade_no');
-            if ($aliResponse->isPaid()) {
-                $this->postPayment($pid, '支付宝当面付 ' . $pid);
-                die('success'); //The response should be 'success' only
-            }
-        } catch (Exception $e) {
-            die('fail');
+//        try {
+//            //这个地方直接根据trade——status判断
+//            /** @var \Omnipay\Alipay\Responses\AopCompletePurchaseResponse $response */
+//            $aliResponse = $aliRequest->send();
+//            $pid = $aliResponse->data('out_trade_no');
+//            if ($aliResponse->isPaid()) {
+//                $this->postPayment($pid, '支付宝当面付 ' . $pid);
+//                die('success'); //The response should be 'success' only
+//            }
+//        } catch (Exception $e) {
+//            die('fail');
+//        }
+        if($_POST['trade_status']=='TRADE_SUCCESS'){
+            $pid = $_POST['out_trade_no'];
+            $this->postPayment($pid, '支付宝当面付 ' . $pid);
+            die('success');
         }
     }
 
